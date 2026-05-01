@@ -3,60 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบเช็คชื่อเข้าแถว Smart Check-in</title>
+    <title>Smart Check-in | ระบบเช็คชื่อเข้าแถว</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Kanit', sans-serif; background-color: #f0f9ff; }
-        .limit-exceeded { background-color: #fee2e2; color: #ef4444; border: 1px solid #ef4444; }
+        body { 
+            font-family: 'Kanit', sans-serif; 
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            min-height: 100vh;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .status-select:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
     </style>
 </head>
-<body>
-    <div class="min-h-screen pb-10">
-        <!-- Header -->
-        <nav class="bg-blue-600 text-white p-6 shadow-lg mb-8">
-            <div class="container mx-auto flex justify-between items-center">
-                <h1 class="text-2xl font-bold">Smart Check-in System</h1>
-                <div class="text-sm bg-blue-500 px-4 py-2 rounded-full border border-blue-300">อังคาร, พฤหัสบดี</div>
-            </div>
-        </nav>
+<body class="p-0 m-0">
 
-        <div class="container mx-auto px-4">
-            <!-- Dashboard -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                <div class="bg-white p-6 rounded-xl shadow-md border-l-4 border-blue-500">
-                    <p class="text-gray-500">จำนวนนักเรียนทั้งหมด</p>
-                    <p class="text-3xl font-bold text-blue-600">32 คน</p>
+    <!-- Navbar -->
+    <nav class="bg-blue-600 text-white shadow-xl sticky top-0 z-50">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="bg-white p-2 rounded-lg">
+                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="id-card"></path>
+                    </svg>
                 </div>
-                <div class="bg-white p-6 rounded-xl shadow-md border-l-4 border-orange-400">
-                    <p class="text-gray-500">ขีดจำกัดสะสมสูงสุด</p>
-                    <p class="text-3xl font-bold text-orange-600">ไม่เกิน 6 ครั้ง</p>
+                <h1 class="text-xl font-semibold tracking-wide">Smart Check-in</h1>
+            </div>
+            <div id="clock" class="hidden md:block bg-blue-700 px-4 py-2 rounded-full text-sm font-medium border border-blue-400">
+                โหลดข้อมูล...
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-8 max-w-5xl">
+        <!-- Date Header Card -->
+        <div class="glass-card rounded-3xl p-6 shadow-sm mb-8 border-l-8 border-blue-500 flex flex-col md:flex-row justify-between items-center">
+            <div class="mb-4 md:mb-0">
+                <p class="text-blue-600 text-sm font-semibold uppercase tracking-wider">กำลังทำรายการประจำวันที่</p>
+                <h2 id="thai-date" class="text-2xl font-bold text-gray-800 tracking-tight"></h2>
+            </div>
+            <div class="flex space-x-4">
+                <div class="text-center bg-blue-50 px-6 py-2 rounded-2xl">
+                    <p class="text-xs text-blue-500">นักเรียนทั้งหมด</p>
+                    <p class="text-xl font-bold text-blue-700">32 คน</p>
+                </div>
+                <div class="text-center bg-orange-50 px-6 py-2 rounded-2xl">
+                    <p class="text-xs text-orange-500">ขีดจำกัด</p>
+                    <p class="text-xl font-bold text-orange-700">6 ครั้ง</p>
                 </div>
             </div>
+        </div>
 
-            <!-- Table -->
-            <div class="bg-white rounded-2xl shadow-xl overflow-hidden overflow-x-auto">
-                <table class="w-full text-left">
-                    <thead class="bg-blue-600 text-white">
-                        <tr>
-                            <th class="p-4 text-center">ลำดับ</th>
-                            <th class="p-4">ชื่อ-นามสกุล</th>
-                            <th class="p-4 text-center">เลือกสถานะ</th>
-                            <th class="p-4 text-center">ดำเนินการ</th>
+        <!-- Student Table -->
+        <div class="glass-card rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-blue-600 text-white">
+                            <th class="p-5 text-center font-medium w-16">ลำดับ</th>
+                            <th class="p-5 font-medium">ชื่อ-นามสกุล</th>
+                            <th class="p-5 text-center font-medium">สถานะเข้าแถว</th>
+                            <th class="p-5 text-center font-medium">การจัดการ</th>
                         </tr>
                     </thead>
-                    <tbody id="student-list">
-                        <!-- JavaScript will generate rows here -->
+                    <tbody id="student-list" class="divide-y divide-gray-100">
+                        <!-- รายชื่อนักเรียนจะแสดงที่นี่ -->
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
 
+    <footer class="text-center py-8 text-gray-400 text-sm">
+        © 2026 Student Check-in System | GitHub Pages & Google Sheets
+    </footer>
+
     <script>
-        // *** สำคัญ: นำ URL ที่ได้จาก Google Apps Script มาวางตรงนี้ ***
-        const SCRIPT_URL = "
-https://script.google.com/macros/s/AKfycbzN39NMNRch_QBrGfltbPjxDba6UzRtz7ql-cHuobO4K_W2negAEsQTgrYCPUzZ3zAH/exec";
+        // *** สำคัญ: วาง URL ที่ได้จาก Google Apps Script (Web App) ของคุณที่นี่ ***
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyjccLzWnD1FRI0nReeHUUkwzMoG5T5fw3Nu90NbiGNLQGC_P9Fu9y8jlZr0v4fOagp/exec";
 
         const students = [
             "นายเจษฎา ใจอินทร์", "นายภาคภูมิ จันทร์สี", "นายอนุวัฒน์ อ่อนกระโทก", "นางสาวกชนันท์ ธุมา",
@@ -69,57 +100,74 @@ https://script.google.com/macros/s/AKfycbzN39NMNRch_QBrGfltbPjxDba6UzRtz7ql-cHuo
             "นายสุริยะ ศรีนวล", "นายอชิตะ ขอนแก่น", "นายรพีภัทร อยู่ดี", "นายธนพร ชวนทิศ"
         ];
 
-        function renderStudents() {
-            const container = document.getElementById('student-list');
-            students.forEach((name, index) => {
-                const tr = document.createElement('tr');
-                tr.className = "border-b hover:bg-blue-50 transition-colors";
-                tr.innerHTML = `
-                    <td class="p-4 text-center text-gray-400">${index + 1}</td>
-                    <td class="p-4 font-medium text-blue-900">${name}</td>
-                    <td class="p-4 text-center">
-                        <select id="status-${index}" class="bg-gray-50 border border-blue-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-400 outline-none">
-                            <option value="มา">มา</option>
-                            <option value="ขาด">ขาด</option>
-                            <option value="ลา">ลา</option>
-                            <option value="สาย">สาย</option>
-                            <option value="ลากิจ">ลากิจ</option>
-                            <option value="ลาป่วย">ลาป่วย</option>
+        function getFullThaiDate() {
+            const now = new Date();
+            const days = ["อาทิตย์", "จันทร์", "อังคาร", "พุธ", "พฤหัสบดี", "ศุกร์", "เสาร์"];
+            const months = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+            return `วัน${days[now.getDay()]}ที่ ${now.getDate()} ${months[now.getMonth()]} พ.ศ. ${now.getFullYear() + 543}`;
+        }
+
+        window.onload = function() {
+            document.getElementById('thai-date').innerText = getFullThaiDate();
+            const list = document.getElementById('student-list');
+            
+            students.forEach((name, i) => {
+                const row = document.createElement('tr');
+                row.className = "hover:bg-blue-50/50 transition-colors duration-200";
+                row.innerHTML = `
+                    <td class="p-5 text-center text-gray-400 font-medium">${i + 1}</td>
+                    <td class="p-5 font-semibold text-gray-700">${name}</td>
+                    <td class="p-5 text-center">
+                        <select id="status-${i}" class="status-select bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-600 outline-none transition-all cursor-pointer">
+                            <option value="มา">✅ มา</option>
+                            <option value="ขาด">❌ ขาด</option>
+                            <option value="สาย">🕒 สาย</option>
+                            <option value="ลากิจ">📝 ลากิจ</option>
+                            <option value="ลาป่วย">🏥 ลาป่วย</option>
                         </select>
                     </td>
-                    <td class="p-4 text-center">
-                        <button onclick="submitData(${index})" id="btn-${index}" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm shadow-md transition-all">
-                            บันทึก
+                    <td class="p-5 text-center">
+                        <button onclick="sendData(${i})" id="btn-${i}" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-5 py-2 rounded-xl text-sm shadow-md active:transform active:scale-95 transition-all">
+                            บันทึกข้อมูล
                         </button>
                     </td>
                 `;
-                container.appendChild(tr);
+                list.appendChild(row);
             });
-        }
+        };
 
-        async function submitData(index) {
-            const name = students[index];
-            const status = document.getElementById(`status-${index}`).value;
+        async function sendData(index) {
             const btn = document.getElementById(`btn-${index}`);
+            const status = document.getElementById(`status-${index}`).value;
+            const date = document.getElementById('thai-date').innerText;
+            const name = students[index];
 
-            btn.innerText = "กำลังบันทึก...";
             btn.disabled = true;
+            btn.innerHTML = `<span class="flex items-center italic">กำลังส่ง...</span>`;
+            btn.classList.replace('bg-blue-600', 'bg-gray-400');
 
             try {
+                // ส่งข้อมูลไปยัง Google Apps Script
                 await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({ name: name, status: status })
+                    method: "POST",
+                    mode: "no-cors",
+                    body: JSON.stringify({ 
+                        name: name, 
+                        status: status, 
+                        date: date 
+                    })
                 });
-                btn.innerText = "สำเร็จ ✅";
-                btn.className = "bg-green-500 text-white px-4 py-2 rounded-lg text-sm cursor-not-allowed";
+
+                // สำเร็จ
+                btn.innerHTML = "สำเร็จ ✅";
+                btn.classList.replace('bg-gray-400', 'bg-green-500');
             } catch (error) {
-                alert("เกิดข้อผิดพลาดในการเชื่อมต่อ Google Sheets");
-                btn.innerText = "ลองอีกครั้ง";
+                alert("การเชื่อมต่อผิดพลาด! กรุณาตรวจสอบ URL เว็บแอปของคุณ");
                 btn.disabled = false;
+                btn.innerHTML = "ลองอีกครั้ง";
+                btn.classList.replace('bg-gray-400', 'bg-red-500');
             }
         }
-
-        renderStudents();
     </script>
 </body>
 </html>
