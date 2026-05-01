@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบเช็คชื่อเข้าแถว Smart Check-in</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Kanit', sans-serif; background-color: #f0f9ff; }
+        .limit-exceeded { background-color: #fee2e2; color: #ef4444; border: 1px solid #ef4444; }
+    </style>
+</head>
+<body>
+    <div class="min-h-screen pb-10">
+        <!-- Header -->
+        <nav class="bg-blue-600 text-white p-6 shadow-lg mb-8">
+            <div class="container mx-auto flex justify-between items-center">
+                <h1 class="text-2xl font-bold">Smart Check-in System</h1>
+                <div class="text-sm bg-blue-500 px-4 py-2 rounded-full border border-blue-300">อังคาร, พฤหัสบดี</div>
+            </div>
+        </nav>
+
+        <div class="container mx-auto px-4">
+            <!-- Dashboard -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                <div class="bg-white p-6 rounded-xl shadow-md border-l-4 border-blue-500">
+                    <p class="text-gray-500">จำนวนนักเรียนทั้งหมด</p>
+                    <p class="text-3xl font-bold text-blue-600">32 คน</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-md border-l-4 border-orange-400">
+                    <p class="text-gray-500">ขีดจำกัดสะสมสูงสุด</p>
+                    <p class="text-3xl font-bold text-orange-600">ไม่เกิน 6 ครั้ง</p>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="bg-white rounded-2xl shadow-xl overflow-hidden overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead class="bg-blue-600 text-white">
+                        <tr>
+                            <th class="p-4 text-center">ลำดับ</th>
+                            <th class="p-4">ชื่อ-นามสกุล</th>
+                            <th class="p-4 text-center">เลือกสถานะ</th>
+                            <th class="p-4 text-center">ดำเนินการ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="student-list">
+                        <!-- JavaScript will generate rows here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // *** สำคัญ: นำ URL ที่ได้จาก Google Apps Script มาวางตรงนี้ ***
+        const SCRIPT_URL = "
+https://script.google.com/macros/s/AKfycbzN39NMNRch_QBrGfltbPjxDba6UzRtz7ql-cHuobO4K_W2negAEsQTgrYCPUzZ3zAH/exec";
+
+        const students = [
+            "นายเจษฎา ใจอินทร์", "นายภาคภูมิ จันทร์สี", "นายอนุวัฒน์ อ่อนกระโทก", "นางสาวกชนันท์ ธุมา",
+            "นางสาวกมลวรรณ พันทอง", "นางสาวดวงกมล ปวุตตานนท์", "นางสาวขวัญจิรา อินทะนิล", "นางสาวพรพิมล นวลงิ้ว",
+            "นางสาวฟ้าใส ยืนยง", "นางสาววรางคณา โฉมศรี", "นางสาวศศิณา สุวรรณประทีป", "นางสาวสุกัญญา อินจันทร์",
+            "นางสาวสุภาพร ดาวเรือง", "นางสาวเสาวลักษณ์ คำดี", "นางสาวหยาดนรินทร์ เพชรนิล", "นางสาวอรพรรณ เพ็ญเขตร์กร",
+            "นายปรเมธ เสียงเสนาะ", "นายตะวันส่อง ศิริเวช", "นายพิชิต ชัยเกตุ", "นายรัชพล บุญสำรี",
+            "นายธีรพัฒ สังข์เดช", "นายพีรพัฒน์ ไกกาศ", "นางสาวชนัญชิดา โสภาพล", "นางสาวภาวิดา เทวรักษ์ษากูล",
+            "นางสาวบุษกร ศุภลักษณ์", "นางสาวมนัสนันท์ อ่ำเฮง", "นางสาววันวิสา เจริญศิลป์", "นางสาวสุทธิกานต์ แก้วจุ้ย",
+            "นายสุริยะ ศรีนวล", "นายอชิตะ ขอนแก่น", "นายรพีภัทร อยู่ดี", "นายธนพร ชวนทิศ"
+        ];
+
+        function renderStudents() {
+            const container = document.getElementById('student-list');
+            students.forEach((name, index) => {
+                const tr = document.createElement('tr');
+                tr.className = "border-b hover:bg-blue-50 transition-colors";
+                tr.innerHTML = `
+                    <td class="p-4 text-center text-gray-400">${index + 1}</td>
+                    <td class="p-4 font-medium text-blue-900">${name}</td>
+                    <td class="p-4 text-center">
+                        <select id="status-${index}" class="bg-gray-50 border border-blue-200 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-400 outline-none">
+                            <option value="มา">มา</option>
+                            <option value="ขาด">ขาด</option>
+                            <option value="ลา">ลา</option>
+                            <option value="สาย">สาย</option>
+                            <option value="ลากิจ">ลากิจ</option>
+                            <option value="ลาป่วย">ลาป่วย</option>
+                        </select>
+                    </td>
+                    <td class="p-4 text-center">
+                        <button onclick="submitData(${index})" id="btn-${index}" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm shadow-md transition-all">
+                            บันทึก
+                        </button>
+                    </td>
+                `;
+                container.appendChild(tr);
+            });
+        }
+
+        async function submitData(index) {
+            const name = students[index];
+            const status = document.getElementById(`status-${index}`).value;
+            const btn = document.getElementById(`btn-${index}`);
+
+            btn.innerText = "กำลังบันทึก...";
+            btn.disabled = true;
+
+            try {
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ name: name, status: status })
+                });
+                btn.innerText = "สำเร็จ ✅";
+                btn.className = "bg-green-500 text-white px-4 py-2 rounded-lg text-sm cursor-not-allowed";
+            } catch (error) {
+                alert("เกิดข้อผิดพลาดในการเชื่อมต่อ Google Sheets");
+                btn.innerText = "ลองอีกครั้ง";
+                btn.disabled = false;
+            }
+        }
+
+        renderStudents();
+    </script>
+</body>
+</html>
