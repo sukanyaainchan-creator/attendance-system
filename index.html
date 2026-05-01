@@ -3,91 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Check-in | ระบบเช็คชื่อเข้าแถว</title>
+    <title>Smart Attendance | ระบบเช็คชื่อปุ่มเดียว</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        body { 
-            font-family: 'Kanit', sans-serif; 
-            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-            min-height: 100vh;
-        }
-        .glass-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        .status-select:focus {
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-        }
+        body { font-family: 'Kanit', sans-serif; background: #f0f7ff; }
+        .sticky-btn { position: sticky; bottom: 20px; z-index: 40; }
     </style>
 </head>
-<body class="p-0 m-0">
-
-    <!-- Navbar -->
-    <nav class="bg-blue-600 text-white shadow-xl sticky top-0 z-50">
-        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <div class="flex items-center space-x-3">
-                <div class="bg-white p-2 rounded-lg">
-                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="id-card"></path>
-                    </svg>
-                </div>
-                <h1 class="text-xl font-semibold tracking-wide">Smart Check-in</h1>
-            </div>
-            <div id="clock" class="hidden md:block bg-blue-700 px-4 py-2 rounded-full text-sm font-medium border border-blue-400">
-                โหลดข้อมูล...
-            </div>
+<body class="pb-24">
+    <nav class="bg-blue-600 text-white p-5 shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold">Smart Check-in</h1>
+            <div id="thai-date-display" class="bg-blue-700 px-4 py-2 rounded-lg text-sm border border-blue-400"></div>
         </div>
     </nav>
 
-    <div class="container mx-auto px-4 py-8 max-w-5xl">
-        <!-- Date Header Card -->
-        <div class="glass-card rounded-3xl p-6 shadow-sm mb-8 border-l-8 border-blue-500 flex flex-col md:flex-row justify-between items-center">
-            <div class="mb-4 md:mb-0">
-                <p class="text-blue-600 text-sm font-semibold uppercase tracking-wider">กำลังทำรายการประจำวันที่</p>
-                <h2 id="thai-date" class="text-2xl font-bold text-gray-800 tracking-tight"></h2>
+    <div class="container mx-auto px-4 py-8">
+        <!-- Date Display Card -->
+        <div class="bg-white p-6 rounded-3xl shadow-sm border-l-8 border-blue-500 mb-8 flex justify-between items-center">
+            <div>
+                <p class="text-blue-600 text-sm font-semibold uppercase">บันทึกข้อมูลประจำวันที่</p>
+                <h2 id="display-date" class="text-2xl font-bold text-gray-800"></h2>
             </div>
-            <div class="flex space-x-4">
-                <div class="text-center bg-blue-50 px-6 py-2 rounded-2xl">
-                    <p class="text-xs text-blue-500">นักเรียนทั้งหมด</p>
-                    <p class="text-xl font-bold text-blue-700">32 คน</p>
-                </div>
-                <div class="text-center bg-orange-50 px-6 py-2 rounded-2xl">
-                    <p class="text-xs text-orange-500">ขีดจำกัด</p>
-                    <p class="text-xl font-bold text-orange-700">6 ครั้ง</p>
-                </div>
+            <div class="text-right">
+                <p class="text-xs text-gray-400">สถานะ: พร้อมบันทึก</p>
             </div>
         </div>
 
         <!-- Student Table -->
-        <div class="glass-card rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
+        <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100 mb-10">
             <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-blue-600 text-white">
-                            <th class="p-5 text-center font-medium w-16">ลำดับ</th>
-                            <th class="p-5 font-medium">ชื่อ-นามสกุล</th>
-                            <th class="p-5 text-center font-medium">สถานะเข้าแถว</th>
-                            <th class="p-5 text-center font-medium">การจัดการ</th>
+                <table class="w-full text-left">
+                    <thead class="bg-blue-600 text-white text-center">
+                        <tr>
+                            <th class="p-5 w-20">ลำดับ</th>
+                            <th class="p-5 text-left">ชื่อ-นามสกุล</th>
+                            <th class="p-5">เลือกสถานะ</th>
                         </tr>
                     </thead>
-                    <tbody id="student-list" class="divide-y divide-gray-100">
-                        <!-- รายชื่อนักเรียนจะแสดงที่นี่ -->
+                    <tbody id="student-list" class="divide-y divide-gray-50 text-center">
+                        <!-- รายชื่อจะขึ้นตรงนี้ -->
                     </tbody>
                 </table>
             </div>
         </div>
+
+        <!-- ปุ่มบันทึกปุ่มเดียว (Sticky Button) -->
+        <div class="flex justify-center sticky-btn">
+            <button onclick="submitAllData()" id="save-all-btn" class="bg-blue-600 hover:bg-blue-700 text-white text-xl font-bold px-12 py-5 rounded-full shadow-2xl transition-all active:scale-95 flex items-center space-x-3">
+                <span>บันทึกข้อมูลทั้งหมดลง Sheets</span>
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+            </button>
+        </div>
     </div>
 
-    <footer class="text-center py-8 text-gray-400 text-sm">
-        © 2026 Student Check-in System | GitHub Pages & Google Sheets
-    </footer>
-
     <script>
-        // *** สำคัญ: วาง URL ที่ได้จาก Google Apps Script (Web App) ของคุณที่นี่ ***
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwAPywmBZrkm5hD0sdYKfC2LMQzANuuJApRPG_MkSXtbfXmPAPmd9xcZpYn3dDTuoT7/exec";
+        // *** 1. นำ URL ของ Web App มาใส่ตรงนี้ ***
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz7f5zvYpBtaRWTwDDYyHQXVmybZBLimYzvZp1eMLV9-h9vloMimO9KbtGCqFQujJeu/exec";
 
         const students = [
             "นายเจษฎา ใจอินทร์", "นายภาคภูมิ จันทร์สี", "นายอนุวัฒน์ อ่อนกระโทก", "นางสาวกชนันท์ ธุมา",
@@ -100,7 +73,7 @@
             "นายสุริยะ ศรีนวล", "นายอชิตะ ขอนแก่น", "นายรพีภัทร อยู่ดี", "นายธนพร ชวนทิศ"
         ];
 
-        function getFullThaiDate() {
+        function getThaiDate() {
             const now = new Date();
             const days = ["อาทิตย์", "จันทร์", "อังคาร", "พุธ", "พฤหัสบดี", "ศุกร์", "เสาร์"];
             const months = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
@@ -108,64 +81,62 @@
         }
 
         window.onload = function() {
-            document.getElementById('thai-date').innerText = getFullThaiDate();
+            const dateStr = getThaiDate();
+            document.getElementById('thai-date-display').innerText = dateStr;
+            document.getElementById('display-date').innerText = dateStr;
+
             const list = document.getElementById('student-list');
-            
             students.forEach((name, i) => {
-                const row = document.createElement('tr');
-                row.className = "hover:bg-blue-50/50 transition-colors duration-200";
-                row.innerHTML = `
-                    <td class="p-5 text-center text-gray-400 font-medium">${i + 1}</td>
-                    <td class="p-5 font-semibold text-gray-700">${name}</td>
-                    <td class="p-5 text-center">
-                        <select id="status-${i}" class="status-select bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-600 outline-none transition-all cursor-pointer">
-                            <option value="มา">✅ มา</option>
-                            <option value="ขาด">❌ ขาด</option>
-                            <option value="สาย">🕒 สาย</option>
-                            <option value="ลากิจ">📝 ลากิจ</option>
-                            <option value="ลาป่วย">🏥 ลาป่วย</option>
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-blue-50 transition-colors";
+                tr.innerHTML = `
+                    <td class="p-5 text-gray-400 font-medium">${i+1}</td>
+                    <td class="p-5 font-semibold text-gray-700 text-left">${name}</td>
+                    <td class="p-5">
+                        <select id="status-${i}" class="bg-gray-50 border border-blue-100 rounded-xl p-2 px-4 text-sm outline-none cursor-pointer focus:ring-2 focus:ring-blue-400">
+                            <option value="มา">มา</option>
+                            <option value="ขาด">ขาด</option>
+                            <option value="สาย">สาย</option>
+                            <option value="ลากิจ">ลากิจ</option>
+                            <option value="ลาป่วย">ลาป่วย</option>
                         </select>
                     </td>
-                    <td class="p-5 text-center">
-                        <button onclick="sendData(${i})" id="btn-${i}" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-5 py-2 rounded-xl text-sm shadow-md active:transform active:scale-95 transition-all">
-                            บันทึกข้อมูล
-                        </button>
-                    </td>
                 `;
-                list.appendChild(row);
+                list.appendChild(tr);
             });
         };
 
-        async function sendData(index) {
-            const btn = document.getElementById(`btn-${index}`);
-            const status = document.getElementById(`status-${index}`).value;
-            const date = document.getElementById('thai-date').innerText;
-            const name = students[index];
+        async function submitAllData() {
+            const btn = document.getElementById('save-all-btn');
+            const date = document.getElementById('thai-date-display').innerText;
+            const payload = [];
+
+            // รวบรวมข้อมูลทุกคน
+            students.forEach((name, i) => {
+                const status = document.getElementById(`status-${i}`).value;
+                payload.push({ name: name, status: status });
+            });
+
+            if(!confirm("ยืนยันการบันทึกข้อมูลของนักเรียนทั้ง 32 คน?")) return;
 
             btn.disabled = true;
-            btn.innerHTML = `<span class="flex items-center italic">กำลังส่ง...</span>`;
+            btn.innerText = "กำลังบันทึกข้อมูลทั้งหมด...";
             btn.classList.replace('bg-blue-600', 'bg-gray-400');
 
             try {
-                // ส่งข้อมูลไปยัง Google Apps Script
                 await fetch(SCRIPT_URL, {
-                    method: "POST",
-                    mode: "no-cors",
-                    body: JSON.stringify({ 
-                        name: name, 
-                        status: status, 
-                        date: date 
-                    })
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: JSON.stringify({ date: date, attendees: payload })
                 });
-
-                // สำเร็จ
-                btn.innerHTML = "สำเร็จ ✅";
+                alert("บันทึกข้อมูลทั้ง 32 คนเรียบร้อยแล้ว!");
+                btn.innerText = "บันทึกสำเร็จเรียบร้อย ✅";
                 btn.classList.replace('bg-gray-400', 'bg-green-500');
             } catch (error) {
-                alert("การเชื่อมต่อผิดพลาด! กรุณาตรวจสอบ URL เว็บแอปของคุณ");
+                alert("เกิดข้อผิดพลาดในการเชื่อมต่อ");
                 btn.disabled = false;
-                btn.innerHTML = "ลองอีกครั้ง";
-                btn.classList.replace('bg-gray-400', 'bg-red-500');
+                btn.innerText = "ลองบันทึกอีกครั้ง";
+                btn.classList.replace('bg-gray-400', 'bg-blue-600');
             }
         }
     </script>
