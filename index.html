@@ -3,106 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบเช็คชื่อเข้าแถว | Smart Attendance</title>
+    <title>Smart Attendance | 31 Students</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Kanit', sans-serif; background: #f0f7ff; }
-        .sticky-footer { position: sticky; bottom: 0; background: rgba(240, 247, 255, 0.9); backdrop-filter: blur(5px); }
-    </style>
+    <style>body { font-family: 'Kanit', sans-serif; background: #f0f7ff; }</style>
 </head>
-<body class="pb-10">
-    <nav class="bg-blue-600 text-white p-5 shadow-lg sticky top-0 z-50">
-        <div class="container mx-auto flex justify-between items-center">
-            <h1 class="text-xl font-bold italic">Smart Check-in</h1>
-            <div id="display-date" class="bg-blue-700 px-4 py-2 rounded-lg text-sm font-bold border border-blue-400"></div>
-        </div>
+<body class="pb-24">
+    <nav class="bg-blue-600 text-white p-5 shadow-lg sticky top-0 z-50 flex justify-between items-center">
+        <h1 class="text-xl font-bold italic">Smart Check-in</h1>
+        <div id="date-display" class="bg-blue-700 px-4 py-2 rounded-lg text-sm font-bold border border-blue-400"></div>
     </nav>
 
     <div class="container mx-auto px-4 py-8 max-w-4xl">
-        <div class="bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
+        <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
             <table class="w-full text-left">
                 <thead class="bg-blue-600 text-white text-center">
-                    <tr>
-                        <th class="p-5 w-20">ลำดับ</th>
-                        <th class="p-5 text-left">ชื่อ-นามสกุล</th>
-                        <th class="p-5">เลือกสถานะ</th>
-                    </tr>
+                    <tr><th class="p-5 w-20">ลำดับ</th><th class="p-5 text-left">ชื่อ-นามสกุล</th><th class="p-5">สถานะ</th></tr>
                 </thead>
-                <tbody id="student-list" class="divide-y divide-gray-50 text-center font-medium text-gray-700">
-                    <!-- รายชื่อจะแสดงที่นี่ -->
-                </tbody>
+                <tbody id="student-list" class="divide-y divide-gray-50 text-center"></tbody>
             </table>
         </div>
-        
-        <div class="mt-10 flex justify-center sticky-footer py-6">
-            <button onclick="submitAttendance()" id="submit-btn" class="bg-blue-600 hover:bg-blue-700 text-white text-xl font-bold px-16 py-5 rounded-full shadow-2xl transition-all active:scale-95 flex items-center space-x-3">
-                <span>บันทึกข้อมูลทั้งหมด</span>
-            </button>
+        <div class="mt-10 flex justify-center sticky bottom-5 py-4">
+            <button onclick="submitData()" id="btn" class="bg-blue-600 hover:bg-blue-700 text-white text-xl font-bold px-16 py-5 rounded-full shadow-2xl active:scale-95 transition-all">บันทึกทั้งหมด</button>
         </div>
     </div>
 
     <script>
-        // *** 1. วาง URL เว็บแอปของคุณตรงนี้ ***
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzt4uzcQIpyvBtm-Ngd49_FD-8KLkEAP1FLqqanCgS_wRuvreM6L1borVsQxJftDnkp/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwdJVKKkMubdq2SvP_ioAAC12nM2lua06Zsu6fhnsTwEK7lk7ob5DAhFTFrUWRSlbzy/exec"; // *** วาง URL ที่นี่[cite: 1]
+        const students = ["นายเจษฎา ใจอินทร์","นายภาคภูมิ จันทร์สี","นายอนุวัฒน์ อ่อนกระโทก","นางสาวกชนันท์ ธุมา","นางสาวกมลวรรณ พันทอง","นางสาวดวงกมล ปวุตตานนท์","นางสาวขวัญจิรา อินทะนิล","นางสาวพรพิมล นวลงิ้ว","นางสาวฟ้าใส ยืนยง","นางสาววรางคณา โฉมศรี","นางสาวศศิณา สุวรรณประทีป","นางสาวสุกัญญา อินจันทร์","นางสาวสุภาพร ดาวเรือง","นางสาวเสาวลักษณ์ คำดี","นางสาวหยาดนรินทร์ เพชรนิล","นางสาวอรพรรณ เพ็ญเขตร์กร","นายปรเมธ เสียงเสนาะ","นายตะวันส่อง ศิริเวช","นายพิชิต ชัยเกตุ","นายรัชพล บุญสำรี","นายธีรพัฒ สังข์เดช","นายพีรพัฒน์ ไกกาศ","นางสาวชนัญชิดา โสภาพล","นางสาวภาวิดา เทวรักษ์ษากูล","นางสาวบุษกร ศุภลักษณ์","นางสาวมนัสนันท์ อ่ำเฮง","นางสาวสุทธิกานต์ แก้วจุ้ย","นายสุริยะ ศรีนวล","นายอชิตะ ขอนแก่น","นายรพีภัทร อยู่ดี","นายธนพร ชวนทิศ"];
 
-        const students = ["นายเจษฎา ใจอินทร์", "นายภาคภูมิ จันทร์สี", "นายอนุวัฒน์ อ่อนกระโทก", "นางสาวกชนันท์ ธุมา", "นางสาวกมลวรรณ พันทอง", "นางสาวดวงกมล ปวุตตานนท์", "นางสาวขวัญจิรา อินทะนิล", "นางสาวพรพิมล นวลงิ้ว", "นางสาวฟ้าใส ยืนยง", "นางสาววรางคณา โฉมศรี", "นางสาวศศิณา สุวรรณประทีป", "นางสาวสุกัญญา อินจันทร์", "นางสาวสุภาพร ดาวเรือง", "นางสาวเสาวลักษณ์ คำดี", "นางสาวหยาดนรินทร์ เพชรนิล", "นางสาวอรพรรณ เพ็ญเขตร์กร", "นายปรเมธ เสียงเสนาะ", "นายตะวันส่อง ศิริเวช", "นายพิชิต ชัยเกตุ", "นายรัชพล บุญสำรี", "นายธีรพัฒ สังข์เดช", "นายพีรพัฒน์ ไกกาศ", "นางสาวชนัญชิดา โสภาพล", "นางสาวภาวิดา เทวรักษ์ษากูล", "นางสาวบุษกร ศุภลักษณ์", "นางสาวมนัสนันท์ อ่ำเฮง", "นางสาววันวิสา เจริญศิลป์", "นางสาวสุทธิกานต์ แก้วจุ้ย", "นายสุริยะ ศรีนวล", "นายอชิตะ ขอนแก่น", "นายรพีภัทร อยู่ดี", "นายธนพร ชวนทิศ"];
-
-        function getThaiDate() {
+        window.onload = () => {
             const now = new Date();
-            const days = ["อาทิตย์", "จันทร์", "อังคาร", "พุธ", "พฤหัสบดี", "ศุกร์", "เสาร์"];
-            const months = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
-            return `วัน${days[now.getDay()]}ที่ ${now.getDate()} ${months[now.getMonth()]} พ.ศ. ${now.getFullYear() + 543}`;
-        }
-
-        window.onload = function() {
-            document.getElementById('display-date').innerText = getThaiDate();
+            const dateStr = `วัน${["อาทิตย์","จันทร์","อังคาร","พุธ","พฤหัสบดี","ศุกร์","เสาร์"][now.getDay()]}ที่ ${now.getDate()} ${["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"][now.getMonth()]} พ.ศ. ${now.getFullYear()+543}`;
+            document.getElementById('date-display').innerText = dateStr;
             const list = document.getElementById('student-list');
             students.forEach((name, i) => {
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-blue-50 transition-colors";
-                tr.innerHTML = `
-                    <td class="p-4 text-gray-400 font-bold">${i+1}</td>
-                    <td class="p-4 text-left">${name}</td>
-                    <td class="p-4">
-                        <select id="status-${i}" class="bg-gray-50 border border-blue-100 rounded-xl p-2 outline-none cursor-pointer focus:ring-2 focus:ring-blue-400">
-                            <option value="มา">มา</option>
-                            <option value="ขาด">ขาด</option>
-                            <option value="สาย">สาย</option>
-                            <option value="ลากิจ">ลากิจ</option>
-                            <option value="ลาป่วย">ลาป่วย</option>
-                        </select>
-                    </td>`;
+                tr.innerHTML = `<td class="p-4 text-gray-400 font-bold">${i+1}</td><td class="p-4 text-left font-medium">${name}</td><td class="p-4"><select id="s-${i}" class="border border-blue-100 rounded-xl p-2 outline-none cursor-pointer"><option value="มา">มา</option><option value="ขาด">ขาด</option><option value="สาย">สาย</option><option value="ลากิจ">ลากิจ</option><option value="ลาป่วย">ลาป่วย</option></select></td>`;
                 list.appendChild(tr);
             });
         };
 
-        async function submitAttendance() {
-            const btn = document.getElementById('submit-btn');
-            const date = document.getElementById('display-date').innerText;
-            const attendees = students.map((name, i) => ({ name: name, status: document.getElementById(`status-${i}`).value }));
-
-            if (!confirm("ยืนยันการบันทึกข้อมูลนักเรียนทั้ง 32 คน?")) return;
-
-            btn.disabled = true;
-            btn.innerText = "กำลังบันทึกลง Google Sheets...";
-            btn.classList.replace('bg-blue-600', 'bg-gray-400');
-
+        async function submitData() {
+            const btn = document.getElementById('btn');
+            const payload = students.map((name, i) => ({ name: name, status: document.getElementById(`s-${i}`).value }));
+            if(!confirm("บันทึกข้อมูลทั้ง 31 คน?")) return;
+            btn.disabled = true; btn.innerText = "กำลังบันทึก...";
             try {
-                await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    body: JSON.stringify({ date: date, attendees: attendees })
-                });
-                alert("บันทึกสำเร็จเรียบร้อย ✅");
-                btn.innerText = "บันทึกสำเร็จ ✅";
-                btn.classList.replace('bg-gray-400', 'bg-green-500');
-            } catch (error) {
-                alert("เกิดข้อผิดพลาดในการเชื่อมต่อ!");
-                btn.disabled = false;
-                btn.innerText = "ลองใหม่อีกครั้ง";
-                btn.classList.replace('bg-gray-400', 'bg-blue-600');
-            }
+                await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ date: document.getElementById('date-display').innerText, attendees: payload }) });
+                alert("สำเร็จ ✅"); btn.innerText = "บันทึกสำเร็จ ✅"; btn.className = "bg-green-500 text-white text-xl font-bold px-16 py-5 rounded-full shadow-2xl";
+            } catch (e) { alert("ล้มเหลว!"); btn.disabled = false; btn.innerText = "ลองอีกครั้ง"; }
         }
     </script>
 </body>
