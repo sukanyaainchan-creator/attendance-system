@@ -3,84 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Attendance | Modern UI</title>
+    <title>Smart Attendance ✨ น่ารักสดใส</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         body { 
             font-family: 'Kanit', sans-serif; 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); /* พื้นหลังสีเหลืองพาสเทล */
             min-height: 100vh;
         }
-        .glass {
+        .cute-card {
             background: rgba(255, 255, 255, 0.9);
             backdrop-filter: blur(10px);
-            border-radius: 2rem;
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 2.5rem;
+            border: 4px solid #ffffff;
+            box-shadow: 0 20px 25px -5px rgba(251, 191, 36, 0.2);
         }
-        .custom-select {
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%234A5568'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 0.75rem center;
-            background-size: 1rem;
+        .status-row {
+            transition: all 0.3s ease;
         }
-        .status-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        .status-row:hover {
+            background-color: #fffbeb;
+            transform: scale(1.01);
         }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        .save-btn {
+            background: linear-gradient(to right, #fbbf24, #f59e0b);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .animate-list { animation: fadeIn 0.5s ease-out forwards; }
+        .save-btn:hover {
+            transform: scale(1.1) rotate(-2deg);
+            box-shadow: 0 15px 20px -5px rgba(245, 158, 11, 0.4);
+        }
+        /* แอนิเมชันตอนโหลดรายชื่อ */
+        @keyframes bounceIn {
+            0% { opacity: 0; transform: scale(0.3); }
+            50% { opacity: 0.9; transform: scale(1.1); }
+            80% { opacity: 1; transform: scale(0.89); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        .animate-pop { animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards; }
     </style>
 </head>
-<body class="py-8 px-4 md:px-0">
-    <div class="max-w-4xl mx-auto">
-        <!-- Header Section -->
-        <header class="flex flex-col md:flex-row justify-between items-center mb-8 text-white px-4">
-            <div class="mb-4 md:mb-0">
-                <h1 class="text-3xl font-bold tracking-tight">Smart Check-in</h1>
-                <p class="text-blue-100 opacity-80 font-light">ระบบบันทึกเวลาเข้าแถวอัตโนมัติ</p>
+<body class="py-10 px-4">
+    <div class="max-w-3xl mx-auto">
+        <!-- Header น่ารักๆ -->
+        <header class="text-center mb-10">
+            <div class="inline-block bg-white p-4 rounded-full shadow-sm mb-4">
+                <span class="text-4xl">🐥</span>
             </div>
-            <div class="bg-white/20 backdrop-blur-md px-6 py-3 rounded-2xl border border-white/30">
-                <span id="date-display" class="font-medium"></span>
+            <h1 class="text-3xl font-bold text-amber-900 mb-2">Smart Check-in</h1>
+            <div class="inline-flex items-center bg-amber-100 text-amber-800 px-4 py-2 rounded-2xl font-medium border border-amber-200">
+                <span class="mr-2">📅</span>
+                <span id="thai-date"></span>
             </div>
         </header>
 
-        <!-- Main Content (Glassmorphism) -->
-        <main class="glass shadow-2xl overflow-hidden mb-24">
-            <div class="p-6 md:p-10">
-                <div class="flex items-center justify-between mb-8 border-b border-gray-100 pb-6">
-                    <h2 class="text-xl font-semibold text-gray-800">รายชื่อนักเรียน (31 คน)</h2>
-                    <div class="flex space-x-2">
-                        <div class="h-3 w-3 rounded-full bg-green-400"></div>
-                        <div class="h-3 w-3 rounded-full bg-yellow-400"></div>
-                        <div class="h-3 w-3 rounded-full bg-red-400"></div>
-                    </div>
-                </div>
-
-                <div id="student-container" class="space-y-3">
-                    <!-- Student Row Template -->
-                </div>
+        <!-- Main Card -->
+        <main class="cute-card overflow-hidden pb-10">
+            <div class="bg-amber-400 p-6 text-center">
+                <h2 class="text-xl font-bold text-white tracking-wide">รายชื่อนักเรียนคนเก่ง (31 คน)</h2>
+            </div>
+            
+            <div id="student-list" class="p-4 md:p-8 space-y-4">
+                <!-- รายชื่อจะถูกใส่ด้วย JS -->
             </div>
         </main>
 
-        <!-- Floating Action Button -->
-        <div class="fixed bottom-8 left-0 right-0 flex justify-center px-4">
-            <button onclick="submitAttendance()" id="submit-btn" 
-                class="bg-gradient-to-r from-green-400 to-emerald-500 hover:from-green-500 hover:to-emerald-600 text-white text-lg font-bold py-5 px-12 rounded-3xl shadow-2xl transition-all hover:scale-105 active:scale-95 flex items-center space-x-3">
-                <span id="btn-text">บันทึกข้อมูลทั้งหมดลง Sheets</span>
-                <svg id="btn-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+        <!-- Floating Button -->
+        <div class="fixed bottom-10 left-0 right-0 flex justify-center px-4">
+            <button onclick="submitAll()" id="main-btn" 
+                class="save-btn text-white text-xl font-bold py-5 px-14 rounded-full shadow-2xl flex items-center space-x-3">
+                <span id="btn-text">บันทึกข้อมูลทั้งหมด ✨</span>
             </button>
         </div>
     </div>
 
     <script>
-        // *** ใส่ URL เว็บแอปของคุณที่นี่ ***
+        // *** อย่าลืมวาง URL เว็บแอปของคุณที่นี่ ***
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwdJVKKkMubdq2SvP_ioAAC12nM2lua06Zsu6fhnsTwEK7lk7ob5DAhFTFrUWRSlbzy/exec";
 
         const students = ["นายเจษฎา ใจอินทร์", "นายภาคภูมิ จันทร์สี", "นายอนุวัฒน์ อ่อนกระโทก", "นางสาวกชนันท์ ธุมา", "นางสาวกมลวรรณ พันทอง", "นางสาวดวงกมล ปวุตตานนท์", "นางสาวขวัญจิรา อินทะนิล", "นางสาวพรพิมล นวลงิ้ว", "นางสาวฟ้าใส ยืนยง", "นางสาววรางคณา โฉมศรี", "นางสาวศศิณา สุวรรณประทีป", "นางสาวสุกัญญา อินจันทร์", "นางสาวสุภาพร ดาวเรือง", "นางสาวเสาวลักษณ์ คำดี", "นางสาวหยาดนรินทร์ เพชรนิล", "นางสาวอรพรรณ เพ็ญเขตร์กร", "นายปรเมธ เสียงเสนาะ", "นายตะวันส่อง ศิริเวช", "นายพิชิต ชัยเกตุ", "นายรัชพล บุญสำรี", "นายธีรพัฒ สังข์เดช", "นายพีรพัฒน์ ไกกาศ", "นางสาวชนัญชิดา โสภาพล", "นางสาวภาวิดา เทวรักษ์ษากูล", "นางสาวบุษกร ศุภลักษณ์", "นางสาวมนัสนันท์ อ่ำเฮง", "นางสาวสุทธิกานต์ แก้วจุ้ย", "นายสุริยะ ศรีนวล", "นายอชิตะ ขอนแก่น", "นายรพีภัทร อยู่ดี", "นายธนพร ชวนทิศ"];
@@ -88,64 +87,64 @@
         window.onload = () => {
             const now = new Date();
             const dateStr = `วัน${["อาทิตย์","จันทร์","อังคาร","พุธ","พฤหัสบดี","ศุกร์","เสาร์"][now.getDay()]}ที่ ${now.getDate()} ${["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"][now.getMonth()]} พ.ศ. ${now.getFullYear()+543}`;
-            document.getElementById('date-display').innerText = dateStr;
+            document.getElementById('thai-date').innerText = dateStr;
 
-            const container = document.getElementById('student-container');
+            const list = document.getElementById('student-list');
             students.forEach((name, i) => {
                 const div = document.createElement('div');
-                div.className = "status-card bg-white p-4 rounded-2xl flex items-center justify-between transition-all border border-gray-100 animate-list";
-                div.style.animationDelay = `${i * 0.05}s`;
+                div.className = "status-row bg-white/50 p-4 rounded-3xl flex items-center justify-between border border-amber-50 animate-pop";
+                div.style.animationDelay = `${i * 0.04}s`;
                 div.innerHTML = `
-                    <div class="flex items-center space-x-4">
-                        <span class="text-sm font-bold text-blue-300 w-6">${i+1}</span>
-                        <span class="font-medium text-gray-700">${name}</span>
+                    <div class="flex items-center space-x-3">
+                        <span class="bg-amber-200 text-amber-700 w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold">${i+1}</span>
+                        <span class="font-medium text-amber-900">${name}</span>
                     </div>
-                    <select id="s-${i}" class="custom-select bg-gray-50 border-none rounded-xl px-4 py-2 text-sm font-medium text-gray-600 focus:ring-2 focus:ring-blue-400 cursor-pointer">
-                        <option value="มา">มา</option>
-                        <option value="ขาด">ขาด</option>
-                        <option value="สาย">สาย</option>
-                        <option value="ลากิจ">ลากิจ</option>
-                        <option value="ลาป่วย">ลาป่วย</option>
+                    <select id="s-${i}" class="bg-white border-2 border-amber-100 rounded-2xl px-3 py-2 text-sm font-bold text-amber-700 outline-none focus:border-amber-400 cursor-pointer">
+                        <option value="มา">✅ มา</option>
+                        <option value="ขาด">❌ ขาด</option>
+                        <option value="สาย">🕒 สาย</option>
+                        <option value="ลากิจ">📝 ลากิจ</option>
+                        <option value="ลาป่วย">🏥 ลาป่วย</option>
                     </select>
                 `;
-                container.appendChild(div);
+                list.appendChild(div);
             });
         };
 
-        async function submitAttendance() {
-            const btn = document.getElementById('submit-btn');
+        async function submitAll() {
+            const btn = document.getElementById('main-btn');
             const btnText = document.getElementById('btn-text');
             const attendees = students.map((name, i) => ({ name: name, status: document.getElementById(`s-${i}`).value }));
 
-            if (!confirm("ยืนยันการบันทึกข้อมูลนักเรียนทั้ง 31 คน?")) return;
+            if (!confirm("บันทึกข้อมูลของเด็กๆ ทั้ง 31 คนเลยไหมคะ? ✨")) return;
 
             btn.disabled = true;
-            btnText.innerText = "กำลังส่งข้อมูล...";
-            btn.classList.add('opacity-70', 'scale-95');
+            btnText.innerText = "กำลังส่งข้อมูลน้าา... 🚀";
+            btn.style.opacity = "0.7";
 
             try {
                 await fetch(SCRIPT_URL, {
                     method: 'POST',
                     mode: 'no-cors',
                     body: JSON.stringify({ 
-                        date: document.getElementById('date-display').innerText, 
+                        date: document.getElementById('thai-date').innerText, 
                         attendees: attendees 
                     })
                 });
-                btn.classList.remove('bg-gradient-to-r', 'from-green-400', 'to-emerald-500');
-                btn.classList.add('bg-blue-600');
-                btnText.innerText = "บันทึกสำเร็จเรียบร้อย ✅";
+                btnText.innerText = "บันทึกสำเร็จแล้วจ้าา! ❤️";
+                btn.style.background = "linear-gradient(to right, #ec4899, #db2777)"; /* เปลี่ยนเป็นสีชมพูตอนสำเร็จ[cite: 1] */
+                
                 setTimeout(() => {
                     btn.disabled = false;
-                    btnText.innerText = "บันทึกข้อมูลทั้งหมดลง Sheets";
-                    btn.classList.add('bg-gradient-to-r', 'from-green-400', 'to-emerald-500');
-                    btn.classList.remove('bg-blue-600', 'opacity-70', 'scale-95');
-                }, 3000);
+                    btnText.innerText = "บันทึกข้อมูลทั้งหมด ✨";
+                    btn.style.background = "linear-gradient(to right, #fbbf24, #f59e0b)";
+                    btn.style.opacity = "1";
+                }, 4000);
             } catch (e) {
-                alert("ล้มเหลว! กรุณาตรวจสอบการเชื่อมต่อ");
+                alert("อุ๊ย! มีบางอย่างผิดพลาด ลองใหม่อีกทีนะคะ");
                 btn.disabled = false;
-                btnText.innerText = "ลองอีกครั้ง";
-                btn.classList.remove('opacity-70', 'scale-95');
+                btnText.innerText = "ลองอีกครั้ง 🔄";
+                btn.style.opacity = "1";
             }
         }
     </script>
