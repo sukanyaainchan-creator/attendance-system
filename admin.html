@@ -25,58 +25,101 @@
             transform: scale(1.02);
             box-shadow: 0 10px 15px -3px rgba(251, 191, 36, 0.3);
         }
+        .btn-action {
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .btn-action:hover {
+            transform: translateY(-3px) scale(1.05);
+        }
     </style>
 </head>
 <body class="p-4 md:p-10">
     <div class="max-w-4xl mx-auto">
-        <!-- Header -->
-        <header class="flex flex-col md:flex-row justify-between items-center mb-8">
-            <div class="text-center md:text-left mb-4 md:mb-0">
-                <h1 class="text-3xl font-bold text-amber-900">🐥 Admin Dashboard</h1>
+        <!-- Header Section -->
+        <header class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+            <div class="text-center md:text-left">
+                <h1 class="text-3xl font-bold text-amber-900 flex items-center justify-center md:justify-start">
+                    🐥 Admin Dashboard
+                </h1>
                 <p class="text-amber-700 opacity-80">ตรวจสอบสถิติการเข้าแถวสะสม</p>
             </div>
-            <a href="index.html" class="bg-white px-6 py-3 rounded-2xl text-amber-600 font-bold shadow-sm border border-amber-200 hover:bg-amber-50 transition-all">
-                ⬅️ กลับหน้าเช็คชื่อ
-            </a>
+            
+            <!-- ปุ่มควบคุมด้านบน -->
+            <div class="flex gap-3 flex-wrap justify-center">
+                <!-- *** ใส่ URL Google Sheets ของคุณตรงช่อง href *** -->
+                <a href="https://docs.google.com/spreadsheets/d/1J_L1zC29-fo7H2PQM8b3cvcA35pRTmrjRW8rp32Lxew/edit?gid=0#gid=0" 
+                   target="_blank" 
+                   class="btn-action bg-emerald-500 text-white px-5 py-3 rounded-2xl font-bold shadow-md flex items-center hover:bg-emerald-600">
+                    <span class="mr-2">📊</span> ไปที่ Sheets
+                </a>
+                
+                <a href="index.html" 
+                   class="btn-action bg-white text-amber-600 px-5 py-3 rounded-2xl font-bold shadow-md border border-amber-200 hover:bg-amber-50">
+                    ⬅️ หน้าเช็คชื่อ
+                </a>
+            </div>
         </header>
 
-        <!-- Search & Info -->
+        <!-- Search & Info Bar -->
         <div class="mb-6 flex flex-col md:flex-row gap-4">
-            <input type="text" id="search" onkeyup="filterNames()" placeholder="🔍 ค้นหาชื่อนักเรียน..." 
-                class="search-bar flex-1 px-6 py-4 rounded-2xl border-none outline-none text-amber-900 font-medium shadow-md">
-            <div class="bg-amber-100 px-6 py-4 rounded-2xl border border-amber-200 text-amber-800 font-bold flex items-center justify-center">
-                รวมนักเรียน 31 คน
+            <div class="relative flex-1">
+                <input type="text" id="search" onkeyup="filterNames()" placeholder="ค้นหาชื่อนักเรียน..." 
+                    class="search-bar w-full px-6 py-4 rounded-3xl border-none outline-none text-amber-900 font-medium shadow-md pr-12">
+                <span class="absolute right-5 top-4 opacity-30">🔍</span>
+            </div>
+            <div class="bg-amber-100 px-8 py-4 rounded-3xl border border-amber-200 text-amber-800 font-bold flex items-center justify-center shadow-sm">
+                นักเรียน 31 คน
             </div>
         </div>
 
         <!-- Main Content -->
-        <main class="glass p-6 md:p-10 shadow-2xl overflow-hidden">
+        <main class="glass p-6 md:p-10 shadow-2xl overflow-hidden border-4 border-white/50">
             <div class="flex justify-between items-center mb-8 border-b border-amber-100 pb-4">
-                <h2 class="text-xl font-bold text-amber-800">สรุปยอดสะสม (ขาด/สาย/ลา)</h2>
-                <button onclick="loadData()" class="text-amber-500 hover:rotate-180 transition-all duration-700 font-bold">
-                    🔄 รีเฟรชข้อมูล
+                <h2 class="text-xl font-bold text-amber-800 flex items-center">
+                    <span class="mr-2">📋</span> สรุปยอดสะสม
+                </h2>
+                <button onclick="loadData()" class="btn-action text-amber-500 font-bold flex items-center hover:text-amber-600">
+                    <span id="refresh-icon" class="mr-1">🔄</span> รีเฟรชข้อมูล
                 </button>
             </div>
             
+            <!-- รายชื่อนักเรียน -->
             <div id="admin-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <p class="col-span-full text-center text-amber-600 py-20 animate-pulse">🐣 กำลังฟักข้อมูลจาก Google Sheets...</p>
+                <div class="col-span-full text-center text-amber-600 py-20">
+                    <p class="animate-pulse text-lg font-medium">🐣 กำลังฟักข้อมูลจาก Google Sheets...</p>
+                </div>
             </div>
         </main>
+        
+        <footer class="text-center mt-10 text-amber-900/40 text-sm">
+            Smart Attendance Admin System v2.0
+        </footer>
     </div>
 
     <script>
-        // ใช้ URL เดียวกับในหน้า index.html
+        // ใช้ URL เว็บแอปของคุณที่ได้จากการ Deploy ล่าสุด
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzyjtdcJ-XSBEvBaKWh5ipmnkxgk2eoNvFd6KWa1SAg5n28ZeFSAXfpAOL09vAiqVhB/exec";
 
         async function loadData() {
             const list = document.getElementById('admin-list');
+            const refreshIcon = document.getElementById('refresh-icon');
+            
+            // เพิ่มแอนิเมชันหมุนที่ปุ่มรีเฟรช
+            refreshIcon.classList.add('animate-spin');
+            
             try {
                 const res = await fetch(SCRIPT_URL);
                 const data = await res.json();
-                window.studentData = data; // เก็บข้อมูลไว้สำหรับค้นหา
+                window.studentData = data; 
                 renderData(data);
             } catch (e) {
-                list.innerHTML = "<p class='col-span-full text-center text-red-500 py-10'>❌ โหลดข้อมูลไม่สำเร็จ กรุณาตรวจสอบการ Deploy Web App</p>";
+                list.innerHTML = `
+                    <div class="col-span-full text-center py-10 bg-red-50 rounded-3xl border-2 border-red-100">
+                        <p class="text-red-500 font-bold">❌ โหลดข้อมูลไม่สำเร็จ</p>
+                        <p class="text-red-400 text-sm mt-2">กรุณาตรวจสอบสิทธิ์การ Deploy Apps Script (ต้องเป็น Anyone)</p>
+                    </div>`;
+            } finally {
+                refreshIcon.classList.remove('animate-spin');
             }
         }
 
@@ -84,20 +127,29 @@
             const list = document.getElementById('admin-list');
             list.innerHTML = "";
             
+            if (data.length === 0) {
+                list.innerHTML = "<p class='col-span-full text-center text-amber-600 py-10'>ไม่พบข้อมูลนักเรียน</p>";
+                return;
+            }
+            
             data.forEach(item => {
-                const isWarn = item.total >= 6;
+                const isWarn = item.total >= 6; // เงื่อนไขการแจ้งเตือน
                 const div = document.createElement('div');
-                div.className = `student-card flex justify-between items-center p-5 rounded-3xl border-2 transition-all ${isWarn ? 'bg-red-50 border-red-200 shadow-lg' : 'bg-white border-amber-50'}`;
+                div.className = `flex justify-between items-center p-5 rounded-3xl border-2 transition-all duration-300 ${isWarn ? 'bg-red-50 border-red-200 shadow-md scale-[1.02]' : 'bg-white border-amber-50 hover:border-amber-200'}`;
+                
                 div.innerHTML = `
                     <div class="flex flex-col">
-                        <span class="font-bold ${isWarn ? 'text-red-600' : 'text-gray-700'}">${item.name}</span>
-                        <span class="text-xs ${isWarn ? 'text-red-400 font-bold' : 'text-gray-400'}">
-                            ${isWarn ? '🚨 เกินกำหนด 6 ครั้ง!' : '✅ สถานะปกติ'}
-                        </span>
+                        <span class="font-bold text-lg ${isWarn ? 'text-red-600' : 'text-amber-900'}">${item.name}</span>
+                        <div class="flex items-center mt-1">
+                            <span class="${isWarn ? 'bg-red-500' : 'bg-green-500'} w-2 h-2 rounded-full mr-2"></span>
+                            <span class="text-xs ${isWarn ? 'text-red-400 font-bold' : 'text-gray-400'} uppercase">
+                                ${isWarn ? '🚨 เกินกำหนด 6 ครั้ง!' : 'สถานะปกติ'}
+                            </span>
+                        </div>
                     </div>
-                    <div class="bg-amber-100 px-4 py-2 rounded-2xl text-center min-w-[60px]">
-                        <span class="text-xl font-black ${isWarn ? 'text-red-600' : 'text-amber-500'}">${item.total}</span>
-                        <span class="text-[10px] text-amber-700 block uppercase font-bold">ครั้ง</span>
+                    <div class="${isWarn ? 'bg-red-100' : 'bg-amber-100'} px-5 py-2 rounded-2xl text-center shadow-inner min-w-[70px]">
+                        <span class="text-2xl font-black ${isWarn ? 'text-red-600' : 'text-amber-600'}">${item.total || 0}</span>
+                        <span class="text-[10px] ${isWarn ? 'text-red-500' : 'text-amber-700'} block font-bold uppercase">ครั้ง</span>
                     </div>
                 `;
                 list.appendChild(div);
@@ -110,6 +162,7 @@
             renderData(filtered);
         }
 
+        // โหลดข้อมูลทันทีเมื่อเปิดหน้า
         loadData();
     </script>
 </body>
