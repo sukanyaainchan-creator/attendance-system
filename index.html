@@ -69,6 +69,11 @@
             </div>
         </main>
 
+        <!-- Footer / Admin Link -->
+        <div class="text-center mt-8 mb-24">
+            <a href="admin.html" class="text-amber-700 font-medium hover:underline">⚙️ สำหรับ Admin (ดูสถิติ)</a>
+        </div>
+
         <!-- Floating Button -->
         <div class="fixed bottom-10 left-0 right-0 flex justify-center px-4">
             <button onclick="submitAll()" id="main-btn" 
@@ -79,8 +84,8 @@
     </div>
 
     <script>
-        // *** อย่าลืมวาง URL เว็บแอปของคุณที่นี่ ***
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwdJVKKkMubdq2SvP_ioAAC12nM2lua06Zsu6fhnsTwEK7lk7ob5DAhFTFrUWRSlbzy/exec";
+        // ใช้ URL เว็บแอปของคุณที่ได้จากการ Deploy ล่าสุด
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyFZexysD3DmnEbcJ0vaTq8WvRgr5p_rpvCXSDnwWJXAsB8lgzoq4SKNTnJNBggi_Q2/exec";
 
         const students = ["นายเจษฎา ใจอินทร์", "นายภาคภูมิ จันทร์สี", "นายอนุวัฒน์ อ่อนกระโทก", "นางสาวกชนันท์ ธุมา", "นางสาวกมลวรรณ พันทอง", "นางสาวดวงกมล ปวุตตานนท์", "นางสาวขวัญจิรา อินทะนิล", "นางสาวพรพิมล นวลงิ้ว", "นางสาวฟ้าใส ยืนยง", "นางสาววรางคณา โฉมศรี", "นางสาวศศิณา สุวรรณประทีป", "นางสาวสุกัญญา อินจันทร์", "นางสาวสุภาพร ดาวเรือง", "นางสาวเสาวลักษณ์ คำดี", "นางสาวหยาดนรินทร์ เพชรนิล", "นางสาวอรพรรณ เพ็ญเขตร์กร", "นายปรเมธ เสียงเสนาะ", "นายตะวันส่อง ศิริเวช", "นายพิชิต ชัยเกตุ", "นายรัชพล บุญสำรี", "นายธีรพัฒ สังข์เดช", "นายพีรพัฒน์ ไกกาศ", "นางสาวชนัญชิดา โสภาพล", "นางสาวภาวิดา เทวรักษ์ษากูล", "นางสาวบุษกร ศุภลักษณ์", "นางสาวมนัสนันท์ อ่ำเฮง", "นางสาวสุทธิกานต์ แก้วจุ้ย", "นายสุริยะ ศรีนวล", "นายอชิตะ ขอนแก่น", "นายรพีภัทร อยู่ดี", "นายธนพร ชวนทิศ"];
 
@@ -114,7 +119,12 @@
         async function submitAll() {
             const btn = document.getElementById('main-btn');
             const btnText = document.getElementById('btn-text');
-            const attendees = students.map((name, i) => ({ name: name, status: document.getElementById(`s-${i}`).value }));
+            
+            // ดึงค่าเฉพาะ "ข้อความสถานะ" (ตัด Emoji ออกเพื่อให้ตรงกับ Apps Script)
+            const attendees = students.map((name, i) => {
+                const fullValue = document.getElementById(`s-${i}`).value;
+                return { name: name, status: fullValue };
+            });
 
             if (!confirm("บันทึกข้อมูลของเด็กๆ ทั้ง 31 คนเลยไหมคะ? ✨")) return;
 
@@ -125,14 +135,16 @@
             try {
                 await fetch(SCRIPT_URL, {
                     method: 'POST',
-                    mode: 'no-cors',
+                    mode: 'no-cors', // สำคัญสำหรับการส่งข้าม Domain
                     body: JSON.stringify({ 
                         date: document.getElementById('thai-date').innerText, 
                         attendees: attendees 
                     })
                 });
+
+                // บันทึกสำเร็จ: เปลี่ยนสีปุ่มเป็นชมพู
                 btnText.innerText = "บันทึกสำเร็จแล้วจ้าา! ❤️";
-                btn.style.background = "linear-gradient(to right, #ec4899, #db2777)"; /* เปลี่ยนเป็นสีชมพูตอนสำเร็จ[cite: 1] */
+                btn.style.background = "linear-gradient(to right, #ec4899, #db2777)";
                 
                 setTimeout(() => {
                     btn.disabled = false;
@@ -140,7 +152,9 @@
                     btn.style.background = "linear-gradient(to right, #fbbf24, #f59e0b)";
                     btn.style.opacity = "1";
                 }, 4000);
+
             } catch (e) {
+                console.error(e);
                 alert("อุ๊ย! มีบางอย่างผิดพลาด ลองใหม่อีกทีนะคะ");
                 btn.disabled = false;
                 btnText.innerText = "ลองอีกครั้ง 🔄";
