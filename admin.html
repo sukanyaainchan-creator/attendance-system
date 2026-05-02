@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard ✨ | ระบบจัดการ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            font-family: 'Kanit', sans-serif; 
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            min-height: 100vh;
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 2.5rem;
+            border: 4px solid #ffffff;
+        }
+        .search-bar {
+            transition: all 0.3s ease;
+        }
+        .search-bar:focus {
+            transform: scale(1.02);
+            box-shadow: 0 10px 15px -3px rgba(251, 191, 36, 0.3);
+        }
+    </style>
+</head>
+<body class="p-4 md:p-10">
+    <div class="max-w-4xl mx-auto">
+        <!-- Header -->
+        <header class="flex flex-col md:flex-row justify-between items-center mb-8">
+            <div class="text-center md:text-left mb-4 md:mb-0">
+                <h1 class="text-3xl font-bold text-amber-900">🐥 Admin Dashboard</h1>
+                <p class="text-amber-700 opacity-80">ตรวจสอบสถิติการเข้าแถวสะสม</p>
+            </div>
+            <a href="index.html" class="bg-white px-6 py-3 rounded-2xl text-amber-600 font-bold shadow-sm border border-amber-200 hover:bg-amber-50 transition-all">
+                ⬅️ กลับหน้าเช็คชื่อ
+            </a>
+        </header>
+
+        <!-- Search & Info -->
+        <div class="mb-6 flex flex-col md:flex-row gap-4">
+            <input type="text" id="search" onkeyup="filterNames()" placeholder="🔍 ค้นหาชื่อนักเรียน..." 
+                class="search-bar flex-1 px-6 py-4 rounded-2xl border-none outline-none text-amber-900 font-medium shadow-md">
+            <div class="bg-amber-100 px-6 py-4 rounded-2xl border border-amber-200 text-amber-800 font-bold flex items-center justify-center">
+                รวมนักเรียน 31 คน
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <main class="glass p-6 md:p-10 shadow-2xl overflow-hidden">
+            <div class="flex justify-between items-center mb-8 border-b border-amber-100 pb-4">
+                <h2 class="text-xl font-bold text-amber-800">สรุปยอดสะสม (ขาด/สาย/ลา)</h2>
+                <button onclick="loadData()" class="text-amber-500 hover:rotate-180 transition-all duration-700 font-bold">
+                    🔄 รีเฟรชข้อมูล
+                </button>
+            </div>
+            
+            <div id="admin-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <p class="col-span-full text-center text-amber-600 py-20 animate-pulse">🐣 กำลังฟักข้อมูลจาก Google Sheets...</p>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // ใช้ URL เดียวกับในหน้า index.html
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwdJVKKkMubdq2SvP_ioAAC12nM2lua06Zsu6fhnsTwEK7lk7ob5DAhFTFrUWRSlbzy/exec";
+
+        async function loadData() {
+            const list = document.getElementById('admin-list');
+            try {
+                const res = await fetch(SCRIPT_URL);
+                const data = await res.json();
+                window.studentData = data; // เก็บข้อมูลไว้สำหรับค้นหา
+                renderData(data);
+            } catch (e) {
+                list.innerHTML = "<p class='col-span-full text-center text-red-500 py-10'>❌ โหลดข้อมูลไม่สำเร็จ กรุณาตรวจสอบการ Deploy Web App</p>";
+            }
+        }
+
+        function renderData(data) {
+            const list = document.getElementById('admin-list');
+            list.innerHTML = "";
+            
+            data.forEach(item => {
+                const isWarn = item.total >= 6;
+                const div = document.createElement('div');
+                div.className = `student-card flex justify-between items-center p-5 rounded-3xl border-2 transition-all ${isWarn ? 'bg-red-50 border-red-200 shadow-lg' : 'bg-white border-amber-50'}`;
+                div.innerHTML = `
+                    <div class="flex flex-col">
+                        <span class="font-bold ${isWarn ? 'text-red-600' : 'text-gray-700'}">${item.name}</span>
+                        <span class="text-xs ${isWarn ? 'text-red-400 font-bold' : 'text-gray-400'}">
+                            ${isWarn ? '🚨 เกินกำหนด 6 ครั้ง!' : '✅ สถานะปกติ'}
+                        </span>
+                    </div>
+                    <div class="bg-amber-100 px-4 py-2 rounded-2xl text-center min-w-[60px]">
+                        <span class="text-xl font-black ${isWarn ? 'text-red-600' : 'text-amber-500'}">${item.total}</span>
+                        <span class="text-[10px] text-amber-700 block uppercase font-bold">ครั้ง</span>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function filterNames() {
+            const query = document.getElementById('search').value.toLowerCase();
+            const filtered = window.studentData.filter(item => item.name.toLowerCase().includes(query));
+            renderData(filtered);
+        }
+
+        loadData();
+    </script>
+</body>
+</html>
