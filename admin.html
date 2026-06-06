@@ -91,14 +91,13 @@
     </div>
 
     <script>
-        // อัปเดตตัวแปร SCRIPT_URL เป็นลิงก์ท่อส่งข้อมูลเวอร์ชันล่าสุดเรียบร้อยแล้วครับ
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwtq1xqN6vJVaGdybzzzjODQiTO5yDY2UmbmlzJonixRyAIuFWXqiB0EIIQWer48nIT/exec";
+        // แก้ไขเป็น URL เวอร์ชันล่าสุดของคุณสุกัญญาเรียบร้อยแล้วค่ะ!
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyDPywUD_CsoRfrglJoAizcZvMqWOmAGQJEWFHhJdJBuMyCnKtcFcC6iM9g9Ll1R7Ntrg/exec";
 
         async function loadData() {
             const list = document.getElementById('admin-list');
             const refreshIcon = document.getElementById('refresh-icon');
             
-            // เพิ่มแอนิเมชันหมุนที่ปุ่มรีเฟรช
             refreshIcon.classList.add('animate-spin');
             
             try {
@@ -127,7 +126,7 @@
             }
             
             data.forEach(item => {
-                const isWarn = item.total >= 6; // เงื่อนไขการแจ้งเตือนเมื่อ ขาด/สาย/ลา รวมกันได้ 6 ครั้งขึ้นไป
+                const isWarn = item.total >= 6; 
                 const div = document.createElement('div');
                 div.className = `flex justify-between items-center p-5 rounded-3xl border-2 transition-all duration-300 ${isWarn ? 'bg-red-50 border-red-200 shadow-md scale-[1.02]' : 'bg-white border-amber-50 hover:border-amber-200'}`;
                 
@@ -156,7 +155,6 @@
             renderData(filtered);
         }
 
-        // โหลดข้อมูลทันทีเมื่อเปิดหน้า
         loadData();
     </script>
 </body>
