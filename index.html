@@ -15,58 +15,14 @@
             50% { opacity: 0.9; transform: scale(1.1); }
             100% { opacity: 1; transform: scale(1); }
         }
-        #app-section { display: none; }
     </style>
 </head>
 <body class="py-10 px-4">
 
-    <!-- ส่วนที่ 1: ระบบสมาชิก (Login / Signup) -->
-    <div id="auth-section" class="max-w-md mx-auto glass p-8 shadow-2xl mt-10 animate-pop flex flex-col items-center">
-        <div class="text-center mb-8">
-            <span class="text-6xl">🔐</span>
-            <h1 id="auth-title" class="text-2xl font-bold text-amber-900 mt-4">เข้าสู่ระบบ</h1>
-            <p class="text-amber-700 text-sm opacity-70">กรุณาลงชื่อเข้าใช้งานเพื่อเช็คชื่อนักเรียน</p>
-        </div>
-
-        <div class="w-full space-y-4">
-            <input type="text" id="user-input" placeholder="ชื่อผู้ใช้งาน (Username)" 
-                class="w-full px-6 py-4 rounded-2xl border-2 border-amber-100 outline-none focus:border-amber-400 transition-all">
-            <input type="password" id="pass-input" placeholder="รหัสผ่าน (Password)" 
-                class="w-full px-6 py-4 rounded-2xl border-2 border-amber-100 outline-none focus:border-amber-400 transition-all">
-            
-            <div id="login-controls" class="space-y-4">
-                <button onclick="handleAuth('login')" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-4 rounded-2xl shadow-lg transition-all active:scale-95">
-                    เข้าสู่ระบบ ✨
-                </button>
-                <p class="text-center text-sm text-amber-800 cursor-pointer hover:underline" onclick="toggleAuth(false)">
-                    ยังไม่มีบัญชี? สมัครสมาชิกใหม่ที่นี่
-                </p>
-            </div>
-
-            <div id="signup-controls" class="space-y-4 hidden">
-                <button onclick="handleAuth('signup')" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-4 rounded-2xl shadow-lg transition-all active:scale-95">
-                    ลงทะเบียนสมาชิก 🐣
-                </button>
-                <p class="text-center text-sm text-amber-800 cursor-pointer hover:underline" onclick="toggleAuth(true)">
-                    มีบัญชีแล้ว? กลับไปหน้าล็อกอิน
-                </p>
-            </div>
-        </div>
-    </div>
-
-    <!-- ส่วนที่ 2: ระบบเช็คชื่อ (App Section) -->
     <div id="app-section" class="max-w-3xl mx-auto">
         <header class="text-center mb-10">
-            <!-- ย้ายปุ่ม Admin ขึ้นมาไว้ข้างบนข้างๆ ปุ่มออกจากระบบ -->
-            <div class="flex justify-between items-center mb-6">
-                <div class="bg-white/50 px-4 py-2 rounded-xl text-xs font-bold text-amber-800 border border-white">
-                    👤 ผู้ใช้งาน: <span id="display-user"></span>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <a href="admin.html" class="text-amber-700 text-sm font-bold hover:underline">⚙️ สำหรับ Admin</a>
-                    <span class="text-amber-200">|</span>
-                    <button onclick="logout()" class="text-red-500 text-sm font-bold hover:underline">🔒 ออกจากระบบ</button>
-                </div>
+            <div class="flex justify-end items-center mb-6">
+                <a href="admin.html" class="text-amber-700 text-sm font-bold hover:underline">⚙️ สำหรับ Admin (ดูสถิติสะสม)</a>
             </div>
             
             <div class="inline-block bg-white p-4 rounded-full shadow-sm mb-4">
@@ -98,54 +54,8 @@
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwtq1xqN6vJVaGdybzzzjODQiTO5yDY2UmbmlzJonixRyAIuFWXqiB0EIIQWer48nIT/exec";
         const students = ["นายเจษฎา ใจอินทร์", "นายภาคภูมิ จันทร์สี", "นายอนุวัฒน์ อ่อนกระโทก", "นางสาวกชนันท์ ธุมา", "นางสาวกมลวรรณ พันทอง", "นางสาวดวงกมล ปวุตตานนท์", "นางสาวขวัญจิรา อินทะนิล", "นางสาวพรพิมล นวลงิ้ว", "นางสาวฟ้าใส ยืนยง", "นางสาววรางคณา โฉมศรี", "นางสาวศศิณา สุวรรณประทีป", "นางสาวสุกัญญา อินจันทร์", "นางสาวสุภาพร ดาวเรือง", "นางสาวเสาวลักษณ์ คำดี", "นางสาวหยาดนรินทร์ เพชรนิล", "นางสาวอรพรรณ เพ็ญเขตร์กร", "นายปรเมธ เสียงเสนาะ", "นายตะวันส่อง ศิริเวช", "นายพิชิต ชัยเกตุ", "นายรัชพล บุญสำรี", "นายธีรพัฒ สังข์เดช", "นายพีรพัฒน์ ไกกาศ", "นางสาวชนัญชิดา โสภาพล", "นางสาวภาวิดา เทวรักษ์ษากูล", "นางสาวบุษกร ศุภลักษณ์", "นางสาวมนัสนันท์ อ่ำเฮง", "นางสาวสุทธิกานต์ แก้วจุ้ย", "นายสุริยะ ศรีนวล", "นายอชิตะ ขอนแก่น", "นายรพีภัทร อยู่ดี", "นายธนพร ชวนทิศ"];
 
-        function toggleAuth(isLogin) {
-            document.getElementById('auth-title').innerText = isLogin ? "เข้าสู่ระบบ" : "สมัครสมาชิกใหม่";
-            document.getElementById('login-controls').classList.toggle('hidden', !isLogin);
-            document.getElementById('signup-controls').classList.toggle('hidden', isLogin);
-        }
-
-        async function handleAuth(mode) {
-            const user = document.getElementById('user-input').value;
-            const pass = document.getElementById('pass-input').value;
-            if (!user || !pass) return alert("กรุณากรอกข้อมูลให้ครบนะคะ 🐥");
-
-            if (mode === 'signup') {
-                try {
-                    await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "signup", username: user, password: pass }) });
-                    alert("สมัครสมาชิกสำเร็จ! ลองเข้าสู่ระบบดูนะคะ ✨");
-                    toggleAuth(true);
-                } catch (e) { alert("สมัครสมาชิกล้มเหลว!"); }
-            } else {
-                const btn = document.querySelector('#login-controls button');
-                btn.innerText = "กำลังตรวจสอบ... ⏳";
-                try {
-                    const res = await fetch(`${SCRIPT_URL}?action=login&user=${user}&pass=${pass}`);
-                    const data = await res.json();
-                    if (data.status === "success") {
-                        sessionStorage.setItem('isLoggedIn', 'true');
-                        sessionStorage.setItem('currentUser', user);
-                        showApp();
-                    } else {
-                        alert("ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้องค่ะ ❌");
-                        btn.innerText = "เข้าสู่ระบบ ✨";
-                    }
-                } catch (e) { alert("การเชื่อมต่อผิดพลาด!"); btn.innerText = "เข้าสู่ระบบ ✨"; }
-            }
-        }
-
-        function showApp() {
-            document.getElementById('auth-section').style.display = 'none';
-            document.getElementById('app-section').style.display = 'block';
-            document.getElementById('display-user').innerText = sessionStorage.getItem('currentUser');
-            initAttendance();
-        }
-
-        function logout() {
-            sessionStorage.clear();
-            location.reload();
-        }
-
-        function initAttendance() {
+        // โหดลรายชื่อนักเรียนทันทีเมื่อเปิดหน้าเว็บ
+        window.onload = () => {
             const now = new Date();
             const dateStr = `วัน${["อาทิตย์","จันทร์","อังคาร","พุธ","พฤหัสบดี","ศุกร์","เสาร์"][now.getDay()]}ที่ ${now.getDate()} ${["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"][now.getMonth()]} พ.ศ. ${now.getFullYear()+543}`;
             document.getElementById('thai-date').innerText = dateStr;
@@ -167,17 +77,22 @@
                         <option value="สาย">🕒 สาย</option>
                         <option value="ลากิจ">📝 ลากิจ</option>
                         <option value="ลาป่วย">🏥 ลาป่วย</option>
-                    </select>`;
+                    </select>
+                `;
                 list.appendChild(div);
             });
-        }
+        };
 
         async function submitAttendance() {
             const btn = document.getElementById('submit-btn');
             const btnText = document.getElementById('submit-btn-text');
             const attendees = students.map((name, i) => ({ name: name, status: document.getElementById(`s-${i}`).value }));
+
             if (!confirm("บันทึกข้อมูลของนักเรียนทั้ง 31 คน? ✨")) return;
-            btn.disabled = true; btnText.innerText = "กำลังส่งข้อมูล... 🚀";
+
+            btn.disabled = true; 
+            btnText.innerText = "กำลังส่งข้อมูล... 🚀";
+            
             try {
                 await fetch(SCRIPT_URL, { 
                     method: 'POST', 
@@ -188,12 +103,12 @@
                 btn.classList.replace('from-amber-400', 'from-pink-400');
                 btn.classList.replace('to-orange-500', 'to-pink-600');
                 setTimeout(() => { location.reload(); }, 3000);
-            } catch (e) { alert("ล้มเหลว!"); btn.disabled = false; btnText.innerText = "ลองอีกครั้ง"; }
+            } catch (e) { 
+                alert("ล้มเหลว!"); 
+                btn.disabled = false; 
+                btnText.innerText = "ลองอีกครั้ง"; 
+            }
         }
-
-        window.onload = () => {
-            if (sessionStorage.getItem('isLoggedIn') === 'true') { showApp(); }
-        };
     </script>
 </body>
 </html>
