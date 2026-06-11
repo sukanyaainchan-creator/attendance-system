@@ -89,7 +89,7 @@
             const btnText = document.getElementById('submit-btn-text');
             const attendees = students.map((name, i) => ({ name: name, status: document.getElementById(`s-${i}`).value }));
 
-            if (!confirm("บันทึกข้อมูลของนักเรียนทั้ง 31 คน? ✨")) return;
+            if (!confirm("บันทึกข้อมูลของนักเรียนทั้ง 32 คน? ✨")) return;
 
             btn.disabled = true; 
             btnText.innerText = "กำลังส่งข้อมูล... 🚀";
