@@ -35,6 +35,7 @@
 </head>
 <body class="p-4 md:p-10">
     <div class="max-w-4xl mx-auto">
+        <!-- Header Section -->
         <header class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
             <div class="text-center md:text-left">
                 <h1 class="text-3xl font-bold text-amber-900 flex items-center justify-center md:justify-start">
@@ -43,6 +44,7 @@
                 <p class="text-amber-700 opacity-80">ตรวจสอบสถิติการเข้าแถวสะสม</p>
             </div>
             
+            <!-- ปุ่มควบคุมด้านบน -->
             <div class="flex gap-3 flex-wrap justify-center">
                 <a href="https://docs.google.com/spreadsheets/d/1J_L1zC29-fo7H2PQM8b3cvcA35pRTmrjRW8rp32Lxew/edit?gid=0#gid=0" 
                    target="_blank" 
@@ -57,6 +59,7 @@
             </div>
         </header>
 
+        <!-- Search & Info Bar -->
         <div class="mb-6 flex flex-col md:flex-row gap-4">
             <div class="relative flex-1">
                 <input type="text" id="search" onkeyup="filterNames()" placeholder="ค้นหาชื่อนักเรียน..." 
@@ -68,16 +71,18 @@
             </div>
         </div>
 
+        <!-- Main Content -->
         <main class="glass p-6 md:p-10 shadow-2xl overflow-hidden border-4 border-white/50">
             <div class="flex justify-between items-center mb-8 border-b border-amber-100 pb-4">
                 <h2 class="text-xl font-bold text-amber-800 flex items-center">
-                    <span class="mr-2">📋</span> สรุปยอดสะสม
+                    <span class="mr-2">📋</span> สรุปยอดสะสม (ขาด/สาย/ลา)
                 </h2>
                 <button onclick="loadData()" class="btn-action text-amber-500 font-bold flex items-center hover:text-amber-600">
                     <span id="refresh-icon" class="mr-1">🔄</span> รีเฟรชข้อมูล
                 </button>
             </div>
             
+            <!-- รายชื่อนักเรียน -->
             <div id="admin-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="col-span-full text-center text-amber-600 py-20">
                     <p class="animate-pulse text-lg font-medium">🐣 กำลังฟักข้อมูลจาก Google Sheets...</p>
@@ -91,7 +96,6 @@
     </div>
 
     <script>
-        // แก้ไขเป็น URL เวอร์ชันล่าสุดของคุณสุกัญญาเรียบร้อยแล้วค่ะ!
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyDPywUD_CsoRfrglJoAizcZvMqWOmAGQJEWFHhJdJBuMyCnKtcFcC6iM9g9Ll1R7Ntrg/exec";
 
         async function loadData() {
@@ -126,23 +130,49 @@
             }
             
             data.forEach(item => {
-                const isWarn = item.total >= 6; 
+                const totalCount = Number(item.total) || 0;
+                
+                // ✨ ดึงข้อความสถานะตรงมาจากคอลัมน์ I ใน Sheets (ถ้าว่างให้เป็นสถานะปกติเริ่มต้น)
+                const currentStatus = item.status ? item.status.toString().trim() : "🟢 สถานะปกติ";
+                
+                let cardClass = "bg-white border-amber-50 hover:border-amber-200";
+                let statusClass = "bg-green-500";
+                let textClass = "text-amber-900";
+                let badgeClass = "bg-amber-100 text-amber-600";
+                let countClass = "text-amber-700";
+
+                // 🎨 ดักจับข้อความในคอลัมน์ I เพื่อเปลี่ยนสีสไตล์ของการ์ดแบบอัตโนมัติ
+                if (currentStatus.includes("เกินกำหนด") || currentStatus.includes("🚨") || currentStatus.includes("วิกฤต")) {
+                    cardClass = "bg-red-50 border-red-200 shadow-md scale-[1.02] animate-pulse";
+                    statusClass = "bg-red-500";
+                    textClass = "text-red-600";
+                    badgeClass = "bg-red-100";
+                    countClass = "text-red-500";
+                } else if (currentStatus.includes("เฝ้าระวัง") || currentStatus.includes("⚠️") || currentStatus.includes("เสี่ยง")) {
+                    cardClass = "bg-orange-50 border-orange-200 shadow-sm";
+                    statusClass = "bg-orange-500";
+                    textClass = "text-orange-700";
+                    badgeClass = "bg-orange-100";
+                    countClass = "text-orange-700";
+                }
+                
                 const div = document.createElement('div');
-                div.className = `flex justify-between items-center p-5 rounded-3xl border-2 transition-all duration-300 ${isWarn ? 'bg-red-50 border-red-200 shadow-md scale-[1.02]' : 'bg-white border-amber-50 hover:border-amber-200'}`;
+                div.className = `flex justify-between items-center p-5 rounded-3xl border-2 transition-all duration-300 ${cardClass}`;
                 
                 div.innerHTML = `
                     <div class="flex flex-col">
-                        <span class="font-bold text-lg ${isWarn ? 'text-red-600' : 'text-amber-900'}">${item.name}</span>
+                        <span class="font-bold text-lg ${textClass}">${item.name}</span>
                         <div class="flex items-center mt-1">
-                            <span class="${isWarn ? 'bg-red-500' : 'bg-green-500'} w-2 h-2 rounded-full mr-2"></span>
-                            <span class="text-xs ${isWarn ? 'text-red-400 font-bold' : 'text-gray-400'} uppercase">
-                                ${isWarn ? '🚨 เกินกำหนด 6 ครั้ง!' : 'สถานะปกติ'}
+                            <span class="${statusClass} w-2 h-2 rounded-full mr-2"></span>
+                            <!-- ✨ แสดงข้อความวิ่งตามคอลัมน์ I ใน Sheets เป๊ะ ๆ -->
+                            <span class="text-xs ${textClass} font-bold uppercase">
+                                ${currentStatus}
                             </span>
                         </div>
                     </div>
-                    <div class="${isWarn ? 'bg-red-100' : 'bg-amber-100'} px-5 py-2 rounded-2xl text-center shadow-inner min-w-[70px]">
-                        <span class="text-2xl font-black ${isWarn ? 'text-red-600' : 'text-amber-600'}">${item.total || 0}</span>
-                        <span class="text-[10px] ${isWarn ? 'text-red-500' : 'text-amber-700'} block font-bold uppercase">ครั้ง</span>
+                    <div class="${badgeClass} px-5 py-2 rounded-2xl text-center shadow-inner min-w-[70px]">
+                        <span class="text-2xl font-black ${textClass}">${totalCount}</span>
+                        <span class="text-[10px] ${countClass} block font-bold uppercase">ครั้ง</span>
                     </div>
                 `;
                 list.appendChild(div);
